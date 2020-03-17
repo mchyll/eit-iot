@@ -4,15 +4,21 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>27e2f9f8-ed6e-4b28-b29a-cc0a2d885112</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileFile>Dockerfile</DockerfileFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DockerfileRunArguments>-p 5000:80 -p 5001:443</DockerfileRunArguments>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ElliotLib\ElliotLib.csproj" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
   </ItemGroup>
 
 
