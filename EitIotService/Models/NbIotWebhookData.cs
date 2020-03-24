@@ -25,6 +25,14 @@ namespace EitIotService.Models
 		public string Imei { get; set; }
 		public string Imsi { get; set; }
 		public Dictionary<string, string> Tags { get; set; }
+		public NbIotDeviceNetwork Network { get; set; }
+	}
+
+	public class NbIotDeviceNetwork
+	{
+		public string AllocatedIp { get; set; }
+		public long AllocatedAt { get; set; }
+		public object CellId { get; set; }
 	}
 
 	public class NbIotCoapMetadata
@@ -35,7 +43,7 @@ namespace EitIotService.Models
 
 	public class NbIotUdpMetadata
 	{
-		public string LocalPort { get; set; }
-		public string RemotePort { get; set; }
+		public int LocalPort { get; set; }
+		public int RemotePort { get; set; }
 	}
 }

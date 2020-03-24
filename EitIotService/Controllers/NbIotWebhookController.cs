@@ -2,8 +2,8 @@
 using EitIotService.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -16,12 +16,15 @@ namespace EitIotService.Controllers
 	public class NbIotWebhookController : ControllerBase
 	{
 		private SensorDataContext context;
+		private ILogger<NbIotWebhookController> log;
 
-		public NbIotWebhookController(SensorDataContext context)
+		public NbIotWebhookController(SensorDataContext context, ILogger<NbIotWebhookController> log)
 		{
 			this.context = context;
+			this.log = log;
 		}
 
+		// POST: api/NbIotWebhook
 		[HttpPost]
 		public async Task<IActionResult> PostSensorData(NbIotWebhookData data)
 		{
@@ -29,10 +32,19 @@ namespace EitIotService.Controllers
 			//Debug.WriteLine($"Raw request body: {rawRequest}");
 			//context.Logs.Add(new Log("NbIotWebhookController.PostSensorData", $"Raw request body: {rawRequest}"));
 
-			context.Logs.Add(new Log("NbIotWebhookController.PostSensorData", $"Got delivery of {data.Messages.Length} messages from NBIoT cloud"));
+			log.LogInformation($"Got delivery of {data.Messages.Length} messages from NBIoT cloud");
+			context.Logs.Add(new Log("NbIotWebhookController.PostSensorData",
+				$"Got delivery of {data.Messages.Length} messages from NBIoT cloud: {JsonSerializer.Serialize(data)}"));
 
 			foreach (var message in data.Messages)
 			{
+				// Ensure the sensor device exists in DB
+				if (await context.SensorDevices.FindAsync(message.Device.DeviceId) == null)
+				{
+					await PostSensor(message.Device);
+				}
+
+				// Decode the payload and store the datapoint in DB
 				var payload = Encoding.UTF8.GetString(Convert.FromBase64String(message.Payload)).Split(' ');
 
 				context.SensorDatas.Add(new SensorData
@@ -46,9 +58,10 @@ namespace EitIotService.Controllers
 
 			await context.SaveChangesAsync();
 
-			return Ok();
+			return Ok("Data accepted and stored.");
 		}
 
+		// POST: api/NbIotWebhook/Sensor
 		[HttpPost("Sensor")]
 		public async Task<IActionResult> PostSensor(NbIotDevice device)
 		{
@@ -56,7 +69,8 @@ namespace EitIotService.Controllers
 			//Debug.WriteLine($"Raw request body: {rawRequest}");
 			//context.Logs.Add(new Log("NbIotWebhookController.PostSensor", $"Raw request body: {rawRequest}"));
 
-			context.Logs.Add(new Log("NbIotWebhookController.PostSensor", $"Adding new sensor with id {device.DeviceId}"));
+			log.LogInformation($"Adding new sensor with id {device.DeviceId}");
+			context.Logs.Add(new Log("NbIotWebhookController.PostSensor", $"Adding new sensor: {JsonSerializer.Serialize(device)}"));
 
 			context.SensorDevices.Add(new SensorDevice
 			{

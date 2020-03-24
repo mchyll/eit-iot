@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.AzureAppServices;
 using System;
 
 namespace EitIotService
@@ -27,11 +29,13 @@ namespace EitIotService
 			services.AddDbContext<SensorDataContext>(options =>
 					options.UseSqlServer(Configuration.GetConnectionString("SensorDataContext")));
 
+			services.Configure<AzureFileLoggerOptions>(Configuration.GetSection("AzureLogging"));
+
 			services.AddSingleton<IUptimeService>(new UptimeService(DateTimeOffset.Now));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> log)
 		{
 			if (env.IsDevelopment())
 			{
@@ -48,6 +52,8 @@ namespace EitIotService
 			{
 				endpoints.MapControllers();
 			});
+
+			log.LogInformation("EitIotService started");
 		}
 	}
 }
