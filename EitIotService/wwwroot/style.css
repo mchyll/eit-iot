@@ -1,0 +1,13 @@
+﻿.bg-color {
+	background-color: #1c522c;
+}
+
+.info-area {
+	margin-top: 4em;
+}
+
+.info-area .row div {
+	min-height: 3em;
+	display: flex;
+	align-items: center;
+}

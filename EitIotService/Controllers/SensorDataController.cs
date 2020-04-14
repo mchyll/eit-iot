@@ -1,6 +1,7 @@
 ﻿using EitIotService.Data;
 using EitIotService.Models;
 using EitIotService.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace EitIotService.Controllers
 {
+    [EnableCors("AllowAnyOrigin")]
     [Route("api/SensorData")]
     [ApiController]
     public class SensorDataController : ControllerBase
@@ -68,6 +70,13 @@ namespace EitIotService.Controllers
             return $"Running version {version}\n"
                     + $"Uptime: {uptime} (since {uptimeService.StartupTime.ToString("o")})\n"
                     + $"Environment: {environment.EnvironmentName}";
+        }
+
+        [HttpGet("Test")]
+        public IActionResult Test()
+        {
+            //return File("~/index.html", "text/html");
+            return Redirect("/");
         }
     }
 }
