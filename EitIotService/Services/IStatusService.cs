@@ -2,8 +2,10 @@
 
 namespace EitIotService.Services
 {
-	public interface IUptimeService
+	public interface IStatusService
 	{
 		DateTimeOffset StartupTime { get; }
+		string RunningVersion { get; }
+		string RunningEnvironment { get; }
 	}
 }

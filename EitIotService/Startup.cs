@@ -9,17 +9,21 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.AzureAppServices;
 using System;
+using System.Reflection;
 
 namespace EitIotService
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
+		public Startup(IConfiguration configuration, IWebHostEnvironment env)
 		{
 			Configuration = configuration;
+			_env = env;
 		}
 
 		public IConfiguration Configuration { get; }
+
+		private readonly IWebHostEnvironment _env;
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
@@ -39,7 +43,8 @@ namespace EitIotService
 
 			services.Configure<AzureFileLoggerOptions>(Configuration.GetSection("AzureLogging"));
 
-			services.AddSingleton<IUptimeService>(new UptimeService(DateTimeOffset.Now));
+			var version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+			services.AddSingleton<IStatusService>(new StatusService(DateTimeOffset.Now, version, _env.EnvironmentName));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

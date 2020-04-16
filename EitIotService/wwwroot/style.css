@@ -2,12 +2,12 @@
 	background-color: #1c522c;
 }
 
-.info-area {
-	margin-top: 4em;
-}
-
-.info-area .row div {
+.info-lines .row {
 	min-height: 3em;
 	display: flex;
 	align-items: center;
+}
+
+.graph-area .card-body {
+	padding: 0.5em;
 }

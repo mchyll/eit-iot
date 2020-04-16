@@ -2,81 +2,79 @@
 using EitIotService.Models;
 using EitIotService.Services;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace EitIotService.Controllers
 {
     [EnableCors("AllowAnyOrigin")]
-    [Route("api/SensorData")]
+    [Route("api")]
     [ApiController]
     public class SensorDataController : ControllerBase
     {
         private readonly SensorDataContext _context;
-        private readonly IUptimeService uptimeService;
-        private readonly IWebHostEnvironment environment;
+        private readonly IStatusService statusService;
 
-        public SensorDataController(SensorDataContext context, IUptimeService uptimeService, IWebHostEnvironment environment)
+        public SensorDataController(SensorDataContext context, IStatusService statusService)
         {
             _context = context;
-            this.uptimeService = uptimeService;
-            this.environment = environment;
+            this.statusService = statusService;
         }
 
-        // GET: api/SensorData/Latest
-        [HttpGet("Latest")]
-        public async Task<ActionResult<SensorData>> GetLatestSensorData()
+        // GET: api/Measurements/Latest?deviceId=a3b2c1
+        [HttpGet("Measurements/Latest")]
+        public async Task<ActionResult<Measurement>> GetLatestSensorData(string deviceId)
         {
-            return await _context.SensorDatas
+            deviceId ??= (await _context.SensorDevices.FirstOrDefaultAsync())?.DeviceId;
+
+            return await _context.SensorDatas.AsNoTracking()
+                .Where(s => s.DeviceId == deviceId)
                 .OrderByDescending(d => d.Timestamp)
                 .ThenByDescending(d => d.Id)
+                .Select(s => new Measurement
+                {
+                    DatapointId = s.Id,
+                    DeviceId = s.DeviceId,
+                    Timestamp = s.Timestamp,
+                    // To find fill percentage, we assume here that the container is 50 cm deep
+                    FillContentPercentage = s.FillContentMeters * 2,
+                    Temperature = s.Temperature
+                })
                 .FirstOrDefaultAsync();
         }
 
-        // GET: api/SensorData
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<SensorData>>> GetSensorDatas()
+        // GET: api/Measurements?deviceId=a3b2c1
+        [HttpGet("Measurements")]
+        public async Task<ActionResult<IEnumerable<Measurement>>> GetSensorDatas(string deviceId)
         {
-            return await _context.SensorDatas.ToListAsync();
+            deviceId ??= (await _context.SensorDevices.FirstOrDefaultAsync())?.DeviceId;
+
+            return await _context.SensorDatas.AsNoTracking()
+                .Where(s => s.DeviceId == deviceId)
+                .Select(s => new Measurement
+                {
+                    DatapointId = s.Id,
+                    DeviceId = s.DeviceId,
+                    Timestamp = s.Timestamp,
+                    // To find fill percentage, we assume here that the container is 50 cm deep
+                    FillContentPercentage = s.FillContentMeters * 2,
+                    Temperature = s.Temperature
+                })
+                .ToListAsync();
         }
 
-        // GET: api/SensorData/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<SensorData>> GetSensorData(long id)
-        {
-            var sensorData = await _context.SensorDatas.FindAsync(id);
-
-            if (sensorData == null)
-            {
-                return NotFound();
-            }
-
-            return sensorData;
-        }
-
-        // GET: api/SensorData/Status
+        // GET: api/Status
         [HttpGet("Status")]
         public string Status()
         {
-            var uptime = DateTimeOffset.Now - uptimeService.StartupTime;
-            var version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-
-            return $"Running version {version}\n"
-                    + $"Uptime: {uptime} (since {uptimeService.StartupTime.ToString("o")})\n"
-                    + $"Environment: {environment.EnvironmentName}";
-        }
-
-        [HttpGet("Test")]
-        public IActionResult Test()
-        {
-            //return File("~/index.html", "text/html");
-            return Redirect("/");
+            var uptime = DateTimeOffset.Now - statusService.StartupTime;
+            return $"Running version {statusService.RunningVersion}\n"
+                    + $"Uptime: {uptime} (since {statusService.StartupTime:o})\n"
+                    + $"Environment: {statusService.RunningEnvironment}";
         }
     }
 }
