@@ -11,3 +11,15 @@
 .graph-area .card-body {
 	padding: 0.5em;
 }
+
+.disclaimer {
+	line-height: 1.5em;
+	font-size: 0.75em;
+	font-weight: 400;
+}
+
+@media (max-width: 575px) {
+	h1.heading {
+		font-size: 2rem;
+	}
+}
