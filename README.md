@@ -9,7 +9,7 @@ En konseptskisse for en IoT-basert løsning for reduksjon av matsvinn i dagligva
 ### Nettside og web-API
 `EitIotService` er et ASP.NET Core-prosjekt som inneholder en prototype for nettsiden og API-et som løsningen tilbyr. Nettsiden er en enkel mock-up ment for å visualisere funksjonene som tilbys sluttbrukeren, og skal gi brukeren oversikt over og tilgang til matbeholdere. Denne nettsiden kommuniserer med tjenesten vår gjennom et enkelt API, hvor en skal kunne hente siste måledata fra de forskjellige sensorenhetene og reservere seg tilgang til matbeholderne.
 
-API-et er definert i kontrolleren `EitIotService/Controllers/SensorDataController.cs`, og mock-up av nettsiden finnes under `EitIotService/wwwroot`.
+API-et er definert i kontrolleren `EitIotService/Controllers/FoodBoxController.cs`, og mock-up av nettsiden finnes under `EitIotService/wwwroot`.
 
 Prototypen av nettløsningen ble rullet ut i produksjon som en App Service i Microsoft Azure. En Azure SQL-database ble benyttet for lagring av sensor- og måledata.
 
