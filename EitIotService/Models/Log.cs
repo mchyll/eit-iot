@@ -2,6 +2,9 @@
 
 namespace EitIotService.Models
 {
+	/// <summary>
+	/// Model for a debug log entry used for testing and development.
+	/// </summary>
 	public class Log
 	{
 		public long Id { get; set; }

@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EitIotService.Models
 {
+	/// <summary>
+	/// Model used for storing sensor device information in the database.
+	/// </summary>
 	public class SensorDevice
 	{
 		[Key]

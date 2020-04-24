@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 
 namespace EitIotService.Controllers
 {
+	/// <summary>
+	/// This controller defines the API for receiving data from the Telenor NBIoT cloud.
+	/// It is a backchannel API which is not meant to be publicly exposed.
+	/// </summary>
 	[Route("api/NbIotWebhook")]
 	[ApiController]
 	public class NbIotWebhookController : ControllerBase

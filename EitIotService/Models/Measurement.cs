@@ -2,6 +2,9 @@
 
 namespace EitIotService.Models
 {
+	/// <summary>
+	/// Data Transfer Object (DTO) for serializing and sending measurement data through the public web API.
+	/// </summary>
 	public class Measurement
 	{
 		public long DatapointId { get; set; }

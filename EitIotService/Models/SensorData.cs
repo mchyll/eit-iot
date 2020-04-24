@@ -2,6 +2,9 @@
 
 namespace EitIotService.Models
 {
+	/// <summary>
+	/// Model used for storing a datapoint from the sensor devices in the database.
+	/// </summary>
 	public class SensorData
 	{
 		public long Id { get; set; }

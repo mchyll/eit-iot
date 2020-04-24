@@ -1,5 +1,5 @@
 ﻿$(function () {
-	fetch("/api/Measurements")
+	fetch("/api/FoodBox/Measurements")
 		.catch(function (err) {
 			console.log("catch " + err);
 		})
@@ -8,11 +8,11 @@
 			return response.json();
 		})
 		.then(function (json) {
-			console.log("then makeChart");
-			makeChart(json);
+			console.log("then makeCharts");
+			makeCharts(json);
 		});
 
-	fetch("/api/Measurements/Latest")
+	fetch("/api/FoodBox/Measurements/Latest")
 		.catch(function (err) {
 			console.log("catch " + err);
 		})
@@ -21,12 +21,21 @@
 			return response.json();
 		})
 		.then(function (json) {
-			console.log("then latestDatapoint");
-			latestDatapoint(json);
+			console.log("then addLatestMeasurementInfo");
+			addLatestMeasurementInfo(json);
 		});
+
+	$("#reserveButton").click(function (event) {
+		fetch("/api/FoodBox/Reserve", {
+			method: "POST"
+		}).then(function (response) {
+			console.log("then HTTP status: " + response.status);
+		});
+	});
 });
 
-function makeChart(json) {
+// Makes the content- and temperature charts from the supplied data.
+function makeCharts(json) {
 	let contentCtx = document.getElementById('content-chart').getContext('2d');
 	let contentChart = new Chart(contentCtx, {
 		type: 'line',
@@ -96,7 +105,8 @@ function makeChart(json) {
 	});
 }
 
-function latestDatapoint(json) {
+// Adds description for the contents of the food box.
+function addLatestMeasurementInfo(json) {
 	let fillDescription;
 
 	if (json.fillContentPercentage < 10) {
